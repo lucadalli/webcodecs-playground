@@ -1,12 +1,17 @@
 <template>
-  <iframe src="https://cursorful.com/welcome" scrolling="no"></iframe>
+  <div style="display: flex">
+    <div style="background: #70e59a; width: 50%; height: 100vh" />
+    <video ref="video" style="width: 50%"></video>
+  </div>
 </template>
 
 <script setup lang="ts">
-;(async () => {
-  // very bizarre, with DRAW_TO_CANVAS = true, MediaRecorder recording displays colors correctly
-  const DRAW_TO_CANVAS = false
+// very bizarre, with DRAW_TO_CANVAS = true, MediaRecorder recording displays colors correctly
+const DRAW_TO_CANVAS = false
 
+const video = useTemplateRef('video')
+
+onMounted(async () => {
   const frameRate = 60
   const bitRate = 35_000_000
   const mediaStream = await navigator.mediaDevices.getDisplayMedia({
@@ -59,6 +64,11 @@
 
   const transformedMediaStream = new MediaStream([trackGenerator])
 
+  const vid = video.value!
+  vid.srcObject = transformedMediaStream
+  vid.muted = true
+  vid.play()
+
   // compare with MediaRecorder
   const mediaRecorder = new MediaRecorder(transformedMediaStream, {
     mimeType: 'video/mp4',
@@ -80,16 +90,11 @@
       '_blank'
     )
   }
-})()
+})
 </script>
 
 <style>
 body {
   margin: 0;
-}
-
-iframe {
-  width: 100vw;
-  height: 100vh;
 }
 </style>
